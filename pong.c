@@ -1,12 +1,13 @@
 #include "pong.h"
 #include "delay.h"
-
+#include <stdio.h>
+#include <string.h>
 void initialBall(){
     ball.ballX = 240;
     ball.ballY = 160;
-    ball.ballDirX = 20;
+    ball.ballDirX = -15;
     ball.ballDirY = 0;
-    ball.ballSize = 5;
+    ball.ballSize = 10;
 }
 
 void calPaddleBoundary(struct Paddle *p) {
@@ -34,7 +35,7 @@ void initialPong() {
     paddle1.paddle_posY = 160;
     paddle1.paddle_dir = 0;
     paddle1.paddle_size = 30;
-    paddle1.thickness = 5;
+    paddle1.thickness = 8;
     paddle1.id = 1;
     paddle1.baseline = paddle1.paddle_posX + paddle1.thickness;
     paddle1.score = 0;
@@ -44,7 +45,7 @@ void initialPong() {
     paddle2.paddle_posY = 160;
     paddle2.paddle_dir = 0;
     paddle2.paddle_size = 30;
-    paddle2.thickness = 5;
+    paddle2.thickness = 8;
     paddle2.id = 0;
     paddle2.baseline = paddle2.paddle_posX - paddle2.thickness;
     paddle2.score = 0;
@@ -138,6 +139,28 @@ void showField(){
     cppp_fillRect(paddle1.paddle_posX, paddle1.paddle_posY - paddle1.paddle_size, paddle1.thickness, 2*paddle1.paddle_size, WHITE);
     
     cppp_fillRect(paddle2.paddle_posX-paddle2.thickness, paddle2.paddle_posY - paddle2.paddle_size, paddle2.thickness, 2*paddle1.paddle_size, WHITE);
+  /*  
+    char title1[10] ="ID: ";
+    char *id1,*s1;
+    sprintf(id1,"%u",paddle1.id);
+    sprintf(s1,"%u",paddle1.score);
+    strcat(title1,id1);
+    strcat(title1,s1);
+
+    char title2[10] = "ID: ";
+    char *id2,*s2;
+    sprintf(id2,"%u",paddle2.id);
+    sprintf(s2,"%u",paddle2.score);
+    strcat(title2,id2);
+    strcat(title2,s2);
+
+    char message[30]=" Score ";
+    strcat(message,title1);
+    strcat(message,title2);
+    writeText_s(message);
+  */  
+    //writeNumberOnDisplay_s(&paddle1.score);
+    //writeNumberOnDisplayRight_s(&paddle2.score);
     
 } 
 
