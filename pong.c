@@ -1,37 +1,39 @@
 #include "pong.h"
+#include "delay.h"
 
 void initialBall(){
     ball.ballX = 240;
     ball.ballY = 160;
-    ball.ballDirX = 5
+    ball.ballDirX = 20;
     ball.ballDirY = 0;
     ball.ballSize = 5;
 }
 
-void calPaddleBoundary(struct Paddle *p){
+void calPaddleBoundary(struct Paddle *p) {
     p->upperBound = p->paddle_posY+p->paddle_size;
     p->lowerBound = p->paddle_posY-p->paddle_size;
     if(p->upperBound > 320)
       p->paddle_posY = 320 - p->paddle_size;
     else if(p->lowerBound < 0)
       p->paddle_posY = 0 + p->paddle_size;
+    //printf("the %d paddleUpperbound is %d, LowerBound is %d ",p->id, p->upperBound,p->lowerBound);
 }
 
-void calBallBoundary(struct Ball *b){
+void calBallBoundary(struct Ball *b) {
     b->upperBound = b->ballY + b->ballSize;
     b->lowerBound = b->ballY - b->ballSize;
     b->leftBound = b->ballX - b->ballSize;
     b->rightBound = b->ballX + b->ballSize;
     checkFieldBoundary(b);
 }
-void initialPong(){
+void initialPong() {
     initialBall();
     calBallBoundary(&ball);
     
     paddle1.paddle_posX = 0;
     paddle1.paddle_posY = 160;
     paddle1.paddle_dir = 0;
-    paddle1.paddle_size = 10;
+    paddle1.paddle_size = 30;
     paddle1.thickness = 5;
     paddle1.id = 1;
     paddle1.baseline = paddle1.paddle_posX + paddle1.thickness;
@@ -41,7 +43,7 @@ void initialPong(){
     paddle2.paddle_posX = 479;
     paddle2.paddle_posY = 160;
     paddle2.paddle_dir = 0;
-    paddle2.paddle_size = 10;
+    paddle2.paddle_size = 30;
     paddle2.thickness = 5;
     paddle2.id = 0;
     paddle2.baseline = paddle2.paddle_posX - paddle2.thickness;
@@ -54,7 +56,7 @@ void initialPong(){
 uint8_t checkCollision(struct Ball *b, struct Paddle *p){
   
     uint8_t rtn = 0;
-    if(b->upperBound < p->upperBound && b->lowerBound > p->lowerBound){
+    if(b->upperBound <= p->upperBound && b->lowerBound >= p->lowerBound){
       rtn = 1;
       b->ballDirY = p->paddle_dir;
       b->ballDirX = - b->ballDirX;
@@ -90,28 +92,28 @@ void readJoystick() {
 
 
     // joystick left
-    if (analog16 >= 220) {
-        paddle1.paddle_dir = 5;
+    if (analog19 >= 220) {
+        paddle1.paddle_dir = -20;
     }
     // joystick middle
-    else if (analog16 < 220 && analog16 >= 180) {
+    else if (analog19 < 220 && analog19 >= 180) {
         paddle1.paddle_dir = 0;
     }
     // joystick right
-    else if (analog16 < 180) {
-        paddle1.paddle_dir = -5;
+    else if (analog19 < 180) {
+        paddle1.paddle_dir = 20;
     }
     
-    if (analog13 >= 220) {
-        paddle2.paddle_dir = -5;
+    if (analog23 >= 220) {
+        paddle2.paddle_dir = -20;
     }
     // joystick middle
-    else if (analog13 < 220 && analog13 >= 180) {
+    else if (analog23 < 220 && analog23 >= 180) {
         paddle2.paddle_dir = 0;
     }
     // joystick right
-    else if (analog13 < 180) {
-        paddle2.paddle_dir = 5;
+    else if (analog23 < 180) {
+        paddle2.paddle_dir = 20;
     }
     
     cppp_microDelay(sleepTime);
@@ -123,9 +125,10 @@ void update(){
     ball.ballY = ball.ballY + ball.ballDirY;
     
     paddle1.paddle_posY = paddle1.paddle_posY + paddle1.paddle_dir;
-    calPaddleBoundary(&paddle1);
+    //calPaddleBoundary(&paddle1);
     paddle2.paddle_posY = paddle2.paddle_posY + paddle2.paddle_dir;
-    cppp_microDelay(sleepTime);
+    //calPaddleBoundary(&paddle2);
+    //cppp_microDelay(sleepTime);
 }
 
 void showField(){
@@ -140,13 +143,13 @@ void showField(){
 
 void checkScore(){
   
-    if(ball.leftBound<paddle1.baseline){     
+    if(ball.leftBound<=paddle1.baseline){     
       if(!checkCollision(&ball, &paddle1)){
         paddle2.score +=1;
         initialBall();     
       }   
     }
-    else if (ball.leftBound>paddle2.baseline){
+    else if (ball.rightBound>=paddle2.baseline){
       if(!checkCollision(&ball, &paddle2)){
         paddle1.score +=1;
         initialBall();
@@ -155,7 +158,7 @@ void checkScore(){
 }
 
 void startPong(){
-  const uint32_t sleepTime = 100000; // 0,1s
+  const uint32_t sleepTime = 10000; // 0,1s
   initialPong();
   while(1){
     readJoystick();
@@ -164,6 +167,7 @@ void startPong(){
     calPaddleBoundary(&paddle1);
     calPaddleBoundary(&paddle2);
     checkScore();
+    printPattern(BLACK, WHITE);
     showField();
     cppp_microDelay(sleepTime);      
   }  
